@@ -1,0 +1,5 @@
+*.env
+singular-backup-*.json
+*.json
+!package*.json
+!poetry.lock

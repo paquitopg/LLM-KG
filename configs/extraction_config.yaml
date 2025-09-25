@@ -1,0 +1,145 @@
+# LLM Knowledge Graph Extraction Configuration
+# This file centralizes extraction settings for better maintainability
+
+# Processing Behavior Settings
+processing_behavior:
+  # KG construction defaults
+  #default_construction_mode can take two arguments: "iterative" or "parallel"
+  #default is "parallel"
+  #"iterative" constructs the KG iteratively by extracting knowledge from each chunk
+  #"parallel" constructs the KG in parallel by extracting knowledge from each chunk
+  default_construction_mode: "parallel"
+  default_extraction_mode: "multimodal"
+  default_max_workers: 60
+  
+  # Output control defaults
+  default_dump_page_kgs: false
+  default_transform_final_kg: false
+  default_run_diagnostics: false
+  
+  # Document-aware processing defaults
+  default_processing_mode: "page_based"
+  default_chunk_size: 4000
+  default_min_chunk_size: 500
+  default_chunk_overlap: 200
+  default_respect_sentence_boundaries: true
+  default_detect_topic_shifts: true
+
+# Document Classification Settings
+document_classification:
+  #default_categories: list of document categories to classify the document into
+  default_categories: ["financial_teaser", "legal_contract", "press_release", "annual_report"]
+  default_classification_model: "${DEFAULT_CLASSIFICATION_MODEL}"
+  default_summary_model: "${DEFAULT_SUMMARY_MODEL}"
+
+# Quality Control Settings
+quality_control:
+  # Relevance filtering threshold (0.0 = very strict, 1.0 = very permissive)
+  relevance_threshold: 0.3
+  
+  # Enable/disable quality filtering
+  enable_quality_filtering: true
+  
+  # Minimum entity quality score to keep
+  min_entity_score: 0.2
+  
+  # Enable/disable over-extraction prevention
+  prevent_over_extraction: true
+
+# Extraction Focus Settings
+extraction_focus:
+  # Prioritize entities related to main entity
+  prioritize_main_entity: false
+  
+  # Maximum number of entities to extract per page (0 = unlimited)
+  max_entities_per_page: 0
+  
+  # Maximum number of relationships to extract per page (0 = unlimited)
+  max_relationships_per_page: 0
+  
+  # Focus on specific entity types (empty list = all types)
+  priority_entity_types:
+    - "pekg:Company"
+    - "pekg:FinancialMetric"
+    - "pekg:ProductOrService"
+    - "pekg:Person"
+    - "pekg:Technology"
+
+# Prompt Engineering Settings
+prompt_engineering:
+  # Enable focused extraction prompts
+  use_focused_prompts: true
+  
+  emphasize_main_entity: false
+  
+  # Include relevance filtering instructions
+  include_relevance_instructions: true
+  
+  # Use ontology-specific examples
+  use_ontology_examples: true
+  
+  # Prompt temperature for extraction (0.0 = deterministic, 1.0 = creative)
+  extraction_temperature: 0.1
+
+# Entity Type Scoring (for relevance calculation)
+entity_type_scores:
+  pekg:Company: 0.8
+  pekg:FinancialMetric: 0.9
+  pekg:Person: 0.7
+  pekg:ProductOrService: 0.8
+  pekg:Technology: 0.7
+  pekg:MarketContext: 0.6
+  pekg:UseCaseOrIndustry: 0.6
+  pekg:Location: 0.5
+  pekg:Shareholder: 0.8
+  pekg:Advisor: 0.4
+  pekg:TransactionContext: 0.7
+  pekg:HistoricalEvent: 0.6
+  pekg:OperationalKPI: 0.8
+  pekg:Headcount: 0.7
+  pekg:GovernmentBody: 0.3
+
+# Document Type Specific Settings
+document_types:
+  financial_teaser:
+    # Focus areas for financial teasers
+    focus_areas:
+      - "Company financial metrics"
+      - "Business model and offerings"
+      - "Market position and competitive advantages"
+      - "Growth strategy and investment highlights"
+    
+    # Avoid extracting for financial teasers
+    avoid_extracting:
+      - "Generic industry information"
+      - "Advisory firm details"
+      - "Project codenames"
+      - "General market overviews"
+  
+  legal_contract:
+    # Focus areas for legal contracts
+    focus_areas:
+      - "Contracting parties"
+      - "Key terms and conditions"
+      - "Financial obligations"
+      - "Legal relationships"
+    
+    # Avoid extracting for legal contracts
+    avoid_extracting:
+      - "Generic legal boilerplate"
+      - "Standard contract clauses"
+      - "Non-binding language"
+
+# Output Settings
+output:
+  # Include relevance scores in output
+  include_relevance_scores: false
+  
+  # Include filtering statistics
+  include_filtering_stats: true
+  
+  # Maximum entities in final KG (0 = unlimited)
+  max_final_entities: 0
+  
+  # Maximum relationships in final KG (0 = unlimited)
+  max_final_relationships: 0 

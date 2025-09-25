@@ -1,0 +1,174 @@
+# LLM Provider Configuration
+# This file contains LLM provider settings and model selection logic
+
+# Azure OpenAI Settings
+azure_openai:
+  api_type: "azure"
+  api_version: "2024-02-15-preview"
+  max_retries: 3
+  timeout: 60
+  request_timeout: 300
+  
+  # Model-specific settings
+  models:
+    gpt_4.1:
+      max_tokens: 4000
+      temperature: 0.1
+      top_p: 0.9
+      frequency_penalty: 0.0
+      presence_penalty: 0.0
+    
+    gpt_4.1_mini:
+      max_tokens: 4000
+      temperature: 0.1
+      top_p: 0.9
+      frequency_penalty: 0.0
+      presence_penalty: 0.0
+    
+    gpt_4o:
+      max_tokens: 4000
+      temperature: 0.1
+      top_p: 0.9
+      frequency_penalty: 0.0
+      presence_penalty: 0.0
+    
+    gpt_o1:
+      max_tokens: 4000
+      temperature: 0.1
+      top_p: 0.9
+      frequency_penalty: 0.0
+      presence_penalty: 0.0
+    
+    gpt_o1_mini:
+      max_tokens: 4000
+      temperature: 0.1
+      top_p: 0.9
+      frequency_penalty: 0.0
+      presence_penalty: 0.0
+
+# Vertex AI Settings
+vertex_ai:
+  max_retries: 3
+  timeout: 60
+  request_timeout: 300
+  use_vertex_ai_search: false
+  
+  # Model-specific settings
+  models:
+    gemini_2_5_flash:
+      max_tokens: 100000
+      temperature: 0.1
+      top_p: 0.9
+      top_k: 40
+    
+    gemini_2_5_pro:
+      max_tokens: 100000
+      temperature: 0.1
+      top_p: 0.9
+      top_k: 40
+
+# Model Selection Logic
+model_selection:
+  # Default provider for different tasks
+  default_provider: "azure_openai"
+  fallback_provider: "vertex_ai"
+  
+  # Default models for different providers (moved from CLI arguments)
+  default_models:
+    azure_openai:
+      main_model: "gpt-4o"
+      classification_model: "gpt-4.1"
+      summary_model: "gpt-4.1"
+    
+    vertex_ai:
+      main_model: "${VERTEXAI_DEFAULT_MODEL}"
+      classification_model: "gemini-2.5-flash"
+      summary_model: "gemini-2.5-flash"
+  
+  # Azure Model Environment Suffixes (moved from CLI arguments)
+  azure_model_suffixes:
+    main_model: "${DEFAULT_MAIN_MODEL_SUFFIX}"
+    classification_model: "${DEFAULT_CLASSIFICATION_MODEL_SUFFIX}"
+    summary_model: "${DEFAULT_SUMMARY_MODEL_SUFFIX}"
+  
+  # Task-specific model selection
+  task_models:
+    text_extraction:
+      primary: "azure_openai.gpt_4.1"
+      fallback: "vertex_ai.gemini_2_5_flash"
+    
+    multimodal_extraction:
+      primary: "azure_openai.gpt_4o"
+      fallback: "vertex_ai.gemini_2_5_pro"
+    
+    summarization:
+      primary: "azure_openai.gpt_4.1"
+      fallback: "vertex_ai.gemini_2_5_flash"
+    
+    complex_extraction:
+      primary: "azure_openai.gpt_o1"
+      fallback: "vertex_ai.gemini_2_5_pro"
+  
+  # Model availability rules
+  availability_rules:
+    - condition: "task == 'multimodal_extraction'"
+      preferred: ["gpt_4o", "gemini_2_5_pro"]
+      avoid: ["gpt_4.1_mini", "gpt_o1_mini"]
+    
+    - condition: "task == 'complex_extraction'"
+      preferred: ["gpt_o1", "gemini_2_5_pro"]
+      avoid: ["gpt_4.1_mini", "gpt_o1_mini"]
+    
+    - condition: "budget_constrained == true"
+      preferred: ["gpt_4.1_mini", "gemini_2_5_flash"]
+      avoid: ["gpt_o1", "gemini_2_5_pro"]
+
+# Rate Limiting and Quotas
+rate_limiting:
+  azure_openai:
+    requests_per_minute: 60
+    tokens_per_minute: 10000
+    enable_backoff: true
+    backoff_factor: 2
+    max_backoff_seconds: 300
+  
+  vertex_ai:
+    requests_per_minute: 100
+    tokens_per_minute: 15000
+    enable_backoff: true
+    backoff_factor: 1.5
+    max_backoff_seconds: 180
+
+# Error Handling
+error_handling:
+  retry_on_errors:
+    - "rate_limit_exceeded"
+    - "timeout"
+    - "service_unavailable"
+    - "internal_server_error"
+  
+  max_retries: 3
+  exponential_backoff: true
+  
+  # Fallback strategies
+  fallback_strategies:
+    - "try_different_model"
+    - "try_different_provider"
+    - "reduce_complexity"
+    - "use_cached_result"
+
+# Performance Optimization
+performance:
+  # Enable model caching
+  enable_model_caching: true
+  cache_ttl_seconds: 3600
+  
+  # Batch processing
+  enable_batch_processing: true
+  max_batch_size: 10
+  
+  # Parallel processing
+  max_concurrent_requests: 5
+  
+  # Response streaming
+  enable_streaming: false 
