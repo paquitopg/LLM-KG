@@ -2,7 +2,7 @@
 
 [![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Last Commit](https://img.shields.io/github/last-commit/paquitopg/LLMKG)](https://github.com/paquitopg/LLMKG)
+[![Last Commit](https://img.shields.io/github/last-commit/paquitopg/LLM-KG)](https://github.com/paquitopg/LLM-KG)
 
 A comprehensive framework for extracting structured knowledge graphs from PDF documents using Large Language Models (LLMs). The system supports both text-based and multimodal extraction, with sophisticated entity merging and ontology-aware processing.
 
